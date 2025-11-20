@@ -2,7 +2,7 @@
 
 A machine learning-powered web application for predicting heart disease and diabetes using Random Forest Classifier. This project provides an intuitive web interface for healthcare professionals and individuals to assess health risks based on clinical parameters.
 
-## 🎯 Features
+##  Features
 
 - **Heart Disease Prediction**: Predicts the likelihood of cardiovascular disease based on 13 clinical features
 - **Diabetes Prediction**: Predicts the likelihood of diabetes based on 8 health metrics
@@ -12,7 +12,7 @@ A machine learning-powered web application for predicting heart disease and diab
 - **Field Information**: Detailed explanations for each input parameter
 - **RESTful API**: Backend API for integration with other applications
 
-## 🛠️ Technologies Used
+##  Technologies Used
 
 - **Backend**: Flask (Python web framework)
 - **Machine Learning**: scikit-learn (Random Forest Classifier)
@@ -21,12 +21,12 @@ A machine learning-powered web application for predicting heart disease and diab
 - **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
 - **CORS**: flask-cors for cross-origin requests
 
-## 📋 Prerequisites
+##  Prerequisites
 
 - Python 3.7 or higher
 - pip (Python package manager)
 
-## 🚀 Installation
+##  Installation
 
 1. **Clone the repository** (or navigate to the project directory):
    ```bash
@@ -60,7 +60,7 @@ A machine learning-powered web application for predicting heart disease and diab
    http://localhost:5000
    ```
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 ml/
@@ -81,7 +81,7 @@ ml/
 └── Dataset of Diabetes .csv
 ```
 
-## 🔌 API Endpoints
+##  API Endpoints
 
 ### Heart Disease Prediction
 - **URL**: `/predict/heart`
@@ -140,7 +140,7 @@ ml/
   }
   ```
 
-## 📊 Model Information
+##  Model Information
 
 ### Heart Disease Model
 - **Algorithm**: Random Forest Classifier
@@ -159,7 +159,7 @@ ml/
 - **Preprocessing**: StandardScaler for feature normalization
 - **Datasets**: Combined from multiple diabetes datasets
 
-## 💻 Usage
+##  Usage
 
 ### Web Interface
 
@@ -211,7 +211,7 @@ print(f"Prediction: {result['message']}")
 print(f"Probability: {result['probability']:.2%}")
 ```
 
-## 🔧 Configuration
+##  Configuration
 
 - **Port**: Default port is 5000. To change it, modify `app.py`:
   ```python
@@ -223,7 +223,7 @@ print(f"Probability: {result['probability']:.2%}")
   RandomForestClassifier(n_estimators=100, random_state=42)
   ```
 
-## ⚠️ Important Notes
+##  Important Notes
 
 - **Medical Disclaimer**: This application is for educational and research purposes only. It should NOT be used as a substitute for professional medical advice, diagnosis, or treatment. Always consult with qualified healthcare professionals for medical decisions.
 
@@ -231,7 +231,7 @@ print(f"Probability: {result['probability']:.2%}")
 
 - **Data Privacy**: Ensure patient data is handled according to applicable privacy regulations (HIPAA, GDPR, etc.) when deploying in production.
 
-## 🧪 Retraining Models
+##  Retraining Models
 
 To retrain the models with updated data:
 
@@ -243,7 +243,7 @@ To retrain the models with updated data:
    ```
 4. The new models will overwrite existing `.pkl` files
 
-## 📝 Dependencies
+##  Dependencies
 
 See `requirements.txt` for the complete list. Key dependencies:
 - Flask 3.0.0
@@ -253,17 +253,11 @@ See `requirements.txt` for the complete list. Key dependencies:
 - joblib 1.3.2
 - flask-cors 4.0.0
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📄 License
 
-This project is for educational purposes as part of a Statistical Machine Learning course.
-
-## 👨‍💻 Author
-
-Developed as part of SEM 3 - Statistical Machine Learning course project at Bennett University.
 
 ---
 
