@@ -259,7 +259,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 
 
----
-
-**Note**: This is an academic project. For production use, ensure proper validation, security measures, and compliance with healthcare regulations.
 
