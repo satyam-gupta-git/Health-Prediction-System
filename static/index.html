@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Health Prediction System</title>
+      
+        <!-- Inter font for a clean modern UI -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+      
+        <style>
+          /* ===========================
+             MODERN DARK GLASS + NEON THEME
+             Option A — Fully Modern Dark Theme
+             =========================== */
+      
+          :root{
+            --bg-1: #0b0f1a;      /* deep space */
+            --bg-2: #101426;      /* outer gradient */
+            --card: rgba(255,255,255,0.04);
+            --glass-border: rgba(255,255,255,0.06);
+            --accent-1: #7d67ff;  /* neon purple */
+            --accent-2: #2dd4ff;  /* neon cyan */
+            --muted: rgba(255,255,255,0.65);
+            --success: #28a745;
+            --danger: #dc3545;
+            --glass-blur: 12px;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+          }
+      
+          /* Reset */
+          *{box-sizing:border-box;margin:0;padding:0}
+          html,body{height:100%}
+          body{
+            font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: radial-gradient(1200px 600px at 10% 10%, rgba(125,103,255,0.12), transparent 8%),
+                        linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 60%);
+            color: #e6eef8;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+            min-height:100vh;
+            padding:28px;
+            line-height:1.45;
+          }
+      
+          /* page container */
+          .container{
+            max-width:1180px;
+            margin:0 auto;
+            padding:28px;
+          }
+      
+          /* header */
+          .header{
+            text-align:center;
+            margin-bottom:28px;
+          }
+          .header h1{
+            font-size:2.6rem;
+            font-weight:800;
+            letter-spacing: -0.02em;
+            margin-bottom:6px;
+            background: linear-gradient(90deg,var(--accent-2),var(--accent-1));
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+          }
+          .header p{
+            color:var(--muted);
+            font-weight:500;
+            font-size:1.02rem;
+          }
+      
+          /* tabs */
+          .tabs{
+            display:flex;
+            gap:12px;
+            justify-content:center;
+            margin:18px 0 26px;
+            flex-wrap:wrap;
+          }
+      
+          .tab-button{
+            padding:10px 26px;
+            border-radius:999px;
+            background: rgba(255,255,255,0.03);
+            color:var(--muted);
+            border:1px solid transparent;
+            cursor:pointer;
+            font-weight:600;
+            transition: all .28s cubic-bezier(.2,.9,.2,1);
+            backdrop-filter: blur(6px);
+            box-shadow: 0 6px 20px rgba(16,20,38,0.45);
+          }
+      
+          .tab-button:hover{ transform: translateY(-4px); box-shadow: 0 10px 30px rgba(16,20,38,0.55); }
+      
+          .tab-button.active{
+            color:#fff;
+            background: linear-gradient(90deg, rgba(125,103,255,0.18), rgba(45,212,255,0.12));
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 12px 40px rgba(125,103,255,0.12);
+          }
+      
+          /* card for tab content */
+          .tab-content{
+            display:none;
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            padding:28px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 12px 40px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+            backdrop-filter: blur(var(--glass-blur));
+            transition: all .32s ease;
+          }
+          .tab-content.active{ display:block; transform: translateY(0); opacity:1; }
+      
+          @keyframes fadeIn { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)} }
+      
+          /* form grid */
+          .form-grid{
+            display:grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap:18px;
+            margin-bottom:18px;
+          }
+      
+          .form-group{
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+          }
+      
+          .form-group label{
+            color:var(--muted);
+            font-weight:600;
+            display:flex;
+            align-items:center;
+            gap:8px;
+            font-size:0.95rem;
+          }
+      
+          /* floating input style */
+          .form-group input,
+          .form-group select{
+            appearance:none;
+            -webkit-appearance:none;
+            width:100%;
+            padding:14px 14px;
+            border-radius:var(--radius-md);
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+            color:#eaf6ff;
+            border: 1px solid rgba(255,255,255,0.04);
+            outline:none;
+            font-size:1rem;
+            transition: all .22s ease;
+            box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+          }
+      
+          .form-group input::placeholder{ color: rgba(230,238,248,0.28); }
+      
+          .form-group input:focus,
+          .form-group select:focus{
+            border-color: rgba(125,103,255,0.9);
+            box-shadow: 0 10px 30px rgba(125,103,255,0.12), 0 2px 8px rgba(45,212,255,0.04);
+            transform: translateY(-2px);
+            background: linear-gradient(180deg, rgba(125,103,255,0.03), rgba(45,212,255,0.02));
+          }
+      
+          /* info icon */
+          .info-icon{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            width:20px;
+            height:20px;
+            border-radius:50%;
+            font-size:12px;
+            color:#fff;
+            background: linear-gradient(90deg,var(--accent-1),var(--accent-2));
+            cursor:pointer;
+            transition: transform .18s;
+            box-shadow: 0 6px 18px rgba(125,103,255,0.12);
+          }
+          .info-icon:hover{ transform: scale(1.08) }
+      
+          /* submit button — neon */
+          .submit-btn{
+            width:100%;
+            padding:14px 18px;
+            border-radius:14px;
+            border: none;
+            cursor:pointer;
+            font-weight:800;
+            font-size:1.05rem;
+            color: #081227;
+            background: linear-gradient(90deg, var(--accent-2), var(--accent-1));
+            box-shadow: 0 12px 40px rgba(125,103,255,0.14), 0 6px 16px rgba(45,212,255,0.06);
+            transition: transform .18s ease, box-shadow .18s ease;
+            margin-top:10px;
+          }
+          .submit-btn:hover{ transform: translateY(-4px); box-shadow: 0 22px 60px rgba(125,103,255,0.18) }
+          .submit-btn:active{ transform: translateY(-1px) scale(.998) }
+      
+          /* loading */
+          .loading{ display:none; text-align:center; margin-top:18px }
+          .spinner{
+            width:44px;height:44px;border-radius:50%;
+            border:4px solid rgba(255,255,255,0.06);
+            border-top:4px solid var(--accent-1);
+            animation: spin 0.95s linear infinite;
+            margin:0 auto;
+          }
+          @keyframes spin{ to{ transform: rotate(360deg) } }
+      
+          /* result cards */
+          .result{
+            margin-top:18px;
+            padding:18px;
+            border-radius:12px;
+            display:none;
+            animation: fadeIn .25s ease;
+            border:1px solid rgba(255,255,255,0.04);
+            background: linear-gradient(180deg, rgba(255,255,255,0.014), rgba(255,255,255,0.01));
+          }
+      
+          .result h3{ margin-bottom:8px; font-size:1.15rem }
+          .result p{ color:var(--muted); margin:6px 0 }
+      
+          .result.success{
+            border-left:4px solid rgba(40,167,69,0.9);
+            background: linear-gradient(90deg, rgba(40,167,69,0.06), rgba(125,103,255,0.01));
+            color:#d9ffee;
+          }
+      
+          .result.danger{
+            border-left:4px solid rgba(220,53,69,0.95);
+            background: linear-gradient(90deg, rgba(220,53,69,0.06), rgba(125,103,255,0.01));
+            color:#ffe6e9;
+          }
+      
+          /* probability bar */
+          .probability-bar{
+            width:100%;
+            height:28px;
+            background: rgba(255,255,255,0.04);
+            border-radius:999px;
+            margin-top:10px;
+            overflow:hidden;
+          }
+      
+          .probability-fill{
+            height:100%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#071024;
+            font-weight:700;
+            transition: width .45s ease;
+            background: linear-gradient(90deg,#00ffb2,#00b4ff);
+            box-shadow: 0 6px 20px rgba(0,180,255,0.08);
+          }
+      
+          /* info box and suggestions */
+          .info-box{
+            background: linear-gradient(90deg, rgba(45,212,255,0.04), rgba(125,103,255,0.03));
+            border-left: 4px solid rgba(125,103,255,0.9);
+            padding:14px;
+            border-radius:10px;
+            color:var(--muted);
+            margin-bottom:12px;
+          }
+          .suggestions{
+            margin-top:16px;
+            padding:14px;
+            border-radius:10px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.006));
+            border-left:4px solid rgba(125,103,255,0.12);
+          }
+          .suggestions h4{ color:#fff; margin-bottom:8px; font-size:1rem }
+          .suggestions ul{ list-style:none; padding:0; margin:0 }
+          .suggestions li{
+            background: rgba(255,255,255,0.02);
+            padding:10px;
+            border-radius:8px;
+            margin-bottom:8px;
+            color:var(--muted);
+            border-left:3px solid rgba(255,255,255,0.02);
+            transition: transform .12s ease, box-shadow .12s ease;
+          }
+          .suggestions li:hover{ transform: translateX(6px); box-shadow: 0 8px 24px rgba(2,6,23,0.6) }
+      
+          /* modal (modern) */
+          .modal{
+            display:none;
+            position:fixed;
+            inset:0;
+            background: linear-gradient(180deg, rgba(2,6,23,0.6), rgba(2,6,23,0.65));
+            backdrop-filter: blur(6px);
+            z-index:1200;
+            padding:28px;
+          }
+          .modal-content{
+            margin:6% auto;
+            max-width:700px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+            border-radius:16px;
+            padding:22px;
+            border:1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 18px 60px rgba(2,6,23,0.7);
+            color:var(--muted);
+          }
+          .modal-header{
+            display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;
+          }
+          .modal-header h3{
+            font-size:1.15rem;
+            background: linear-gradient(90deg,var(--accent-2),var(--accent-1));
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            font-weight:700;
+          }
+          .close{
+            color:rgba(255,255,255,0.6);
+            cursor:pointer;
+            font-size:20px;
+            padding:6px;
+            border-radius:6px;
+            transition: all .12s;
+          }
+          .close:hover{ background: rgba(255,255,255,0.02) }
+      
+          .modal-body p{ margin:8px 0; color:var(--muted) }
+          .modal-body strong{ color:#fff }
+      
+          /* small screens */
+          @media (max-width:768px){
+            body{ padding:18px;}
+            .header h1{ font-size:1.8rem }
+            .container{ padding:0 }
+            .modal-content{ margin-top:12% }
+            .form-grid{ gap:12px }
+          }
+        </style>
+      </head>
+      
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Health Prediction System</h1>
+            <p>AI-Powered Medical Predictions</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('heart')">❤️ Heart Disease</button>
+            <button class="tab-button" onclick="switchTab('diabetes')">🩺 Diabetes</button>
+        </div>
+
+        <!-- Heart Disease Tab -->
+        <div id="heart-tab" class="tab-content active">
+            <div class="info-box">
+                <p><strong>Heart Disease Prediction:</strong> Enter the patient's cardiovascular parameters to predict the likelihood of heart disease.</p>
+            </div>
+            <form id="heart-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="age">Age <span class="info-icon" onclick="showFieldInfo('heart', 'age')">i</span></label>
+                        <input type="number" id="age" name="age" required min="1" max="120">
+                    </div>
+                    <div class="form-group">
+                        <label for="sex">Sex (0=Female, 1=Male) <span class="info-icon" onclick="showFieldInfo('heart', 'sex')">i</span></label>
+                        <select id="sex" name="sex" required>
+                            <option value="0">Female</option>
+                            <option value="1">Male</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cp">Chest Pain Type (0-3) <span class="info-icon" onclick="showFieldInfo('heart', 'cp')">i</span></label>
+                        <input type="number" id="cp" name="cp" required min="0" max="3">
+                    </div>
+                    <div class="form-group">
+                        <label for="trestbps">Resting Blood Pressure (mm Hg) <span class="info-icon" onclick="showFieldInfo('heart', 'trestbps')">i</span></label>
+                        <input type="number" id="trestbps" name="trestbps" required min="0" max="300">
+                    </div>
+                    <div class="form-group">
+                        <label for="chol">Serum Cholesterol (mg/dl) <span class="info-icon" onclick="showFieldInfo('heart', 'chol')">i</span></label>
+                        <input type="number" id="chol" name="chol" required min="0" max="600">
+                    </div>
+                    <div class="form-group">
+                        <label for="fbs">Fasting Blood Sugar > 120 (0=No, 1=Yes) <span class="info-icon" onclick="showFieldInfo('heart', 'fbs')">i</span></label>
+                        <select id="fbs" name="fbs" required>
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="restecg">Resting ECG (0-2) <span class="info-icon" onclick="showFieldInfo('heart', 'restecg')">i</span></label>
+                        <input type="number" id="restecg" name="restecg" required min="0" max="2">
+                    </div>
+                    <div class="form-group">
+                        <label for="thalach">Maximum Heart Rate Achieved <span class="info-icon" onclick="showFieldInfo('heart', 'thalach')">i</span></label>
+                        <input type="number" id="thalach" name="thalach" required min="0" max="250">
+                    </div>
+                    <div class="form-group">
+                        <label for="exang">Exercise Induced Angina (0=No, 1=Yes) <span class="info-icon" onclick="showFieldInfo('heart', 'exang')">i</span></label>
+                        <select id="exang" name="exang" required>
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="oldpeak">ST Depression Induced by Exercise <span class="info-icon" onclick="showFieldInfo('heart', 'oldpeak')">i</span></label>
+                        <input type="number" id="oldpeak" name="oldpeak" required step="0.1" min="0" max="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="slope">Slope of Peak Exercise ST Segment (0-2) <span class="info-icon" onclick="showFieldInfo('heart', 'slope')">i</span></label>
+                        <input type="number" id="slope" name="slope" required min="0" max="2">
+                    </div>
+                    <div class="form-group">
+                        <label for="ca">Number of Major Vessels (0-3) <span class="info-icon" onclick="showFieldInfo('heart', 'ca')">i</span></label>
+                        <input type="number" id="ca" name="ca" required min="0" max="3">
+                    </div>
+                    <div class="form-group">
+                        <label for="thal">Thalassemia (3=Normal, 6=Fixed, 7=Reversible) <span class="info-icon" onclick="showFieldInfo('heart', 'thal')">i</span></label>
+                        <input type="number" id="thal" name="thal" required min="3" max="7">
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">Predict Heart Disease</button>
+            </form>
+            <div class="loading" id="heart-loading">
+                <div class="spinner"></div>
+                <p>Analyzing data...</p>
+            </div>
+            <div id="heart-result" class="result"></div>
+        </div>
+
+        <!-- Diabetes Tab -->
+        <div id="diabetes-tab" class="tab-content">
+            <div class="info-box">
+                <p><strong>Diabetes Prediction:</strong> Enter the patient's health metrics to predict the likelihood of diabetes.</p>
+            </div>
+            <form id="diabetes-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="Pregnancies">Number of Pregnancies <span class="info-icon" onclick="showFieldInfo('diabetes', 'Pregnancies')">i</span></label>
+                        <input type="number" id="Pregnancies" name="Pregnancies" required min="0" max="20">
+                    </div>
+                    <div class="form-group">
+                        <label for="Glucose">Glucose Level (mg/dl) <span class="info-icon" onclick="showFieldInfo('diabetes', 'Glucose')">i</span></label>
+                        <input type="number" id="Glucose" name="Glucose" required min="0" max="300">
+                    </div>
+                    <div class="form-group">
+                        <label for="BloodPressure">Blood Pressure (mm Hg) <span class="info-icon" onclick="showFieldInfo('diabetes', 'BloodPressure')">i</span></label>
+                        <input type="number" id="BloodPressure" name="BloodPressure" required min="0" max="200">
+                    </div>
+                    <div class="form-group">
+                        <label for="SkinThickness">Skin Thickness (mm) <span class="info-icon" onclick="showFieldInfo('diabetes', 'SkinThickness')">i</span></label>
+                        <input type="number" id="SkinThickness" name="SkinThickness" required min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="Insulin">Insulin Level (mu U/ml) <span class="info-icon" onclick="showFieldInfo('diabetes', 'Insulin')">i</span></label>
+                        <input type="number" id="Insulin" name="Insulin" required min="0" max="1000">
+                    </div>
+                    <div class="form-group">
+                        <label for="BMI">Body Mass Index <span class="info-icon" onclick="showFieldInfo('diabetes', 'BMI')">i</span></label>
+                        <input type="number" id="BMI" name="BMI" required step="0.1" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="DiabetesPedigreeFunction">Diabetes Pedigree Function <span class="info-icon" onclick="showFieldInfo('diabetes', 'DiabetesPedigreeFunction')">i</span></label>
+                        <input type="number" id="DiabetesPedigreeFunction" name="DiabetesPedigreeFunction" required step="0.001" min="0" max="3">
+                    </div>
+                    <div class="form-group">
+                        <label for="Age">Age <span class="info-icon" onclick="showFieldInfo('diabetes', 'Age')">i</span></label>
+                        <input type="number" id="Age" name="Age" required min="1" max="120">
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">Predict Diabetes</button>
+            </form>
+            <div class="loading" id="diabetes-loading">
+                <div class="spinner"></div>
+                <p>Analyzing data...</p>
+            </div>
+            <div id="diabetes-result" class="result"></div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Field Information</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Field information database
+        const fieldInfo = {
+            heart: {
+                age: {
+                    title: "Age",
+                    description: "The patient's age in years.",
+                    details: "Age is a significant risk factor for heart disease. Risk increases with age, especially after 45 for men and 55 for women.",
+                    normalRange: "N/A - Age is a continuous variable",
+                    importance: "Higher age increases the risk of cardiovascular disease."
+                },
+                sex: {
+                    title: "Sex",
+                    description: "Biological sex of the patient.",
+                    details: "Men are generally at higher risk for heart disease at younger ages, while women's risk increases after menopause.",
+                    normalRange: "0 = Female, 1 = Male",
+                    importance: "Sex influences the presentation and risk of heart disease."
+                },
+                cp: {
+                    title: "Chest Pain Type",
+                    description: "Type of chest pain experienced by the patient.",
+                    details: "Different types of chest pain can indicate various heart conditions. Type 3 (non-anginal pain) is less likely to be heart-related.",
+                    normalRange: "0 = Typical angina, 1 = Atypical angina, 2 = Non-anginal pain, 3 = Asymptomatic",
+                    importance: "Chest pain type helps diagnose the nature of heart problems."
+                },
+                trestbps: {
+                    title: "Resting Blood Pressure",
+                    description: "Blood pressure measured at rest in millimeters of mercury (mm Hg).",
+                    details: "High blood pressure (hypertension) is a major risk factor for heart disease. Normal is below 120/80 mm Hg.",
+                    normalRange: "Normal: <120 mm Hg, Pre-hypertension: 120-139, Hypertension: ≥140",
+                    importance: "Elevated blood pressure increases strain on the heart and arteries."
+                },
+                chol: {
+                    title: "Serum Cholesterol",
+                    description: "Total cholesterol level in the blood measured in mg/dl.",
+                    details: "High cholesterol can lead to plaque buildup in arteries, increasing heart disease risk. Total cholesterol should be below 200 mg/dl.",
+                    normalRange: "Desirable: <200 mg/dl, Borderline: 200-239, High: ≥240",
+                    importance: "High cholesterol is a major contributor to coronary artery disease."
+                },
+                fbs: {
+                    title: "Fasting Blood Sugar",
+                    description: "Whether fasting blood sugar is above 120 mg/dl.",
+                    details: "Elevated fasting blood sugar may indicate diabetes or pre-diabetes, which significantly increases heart disease risk.",
+                    normalRange: "0 = No (≤120 mg/dl), 1 = Yes (>120 mg/dl)",
+                    importance: "Diabetes and high blood sugar damage blood vessels and increase heart disease risk."
+                },
+                restecg: {
+                    title: "Resting Electrocardiogram",
+                    description: "Results of resting ECG (electrocardiogram) test.",
+                    details: "ECG measures the electrical activity of the heart. Abnormalities can indicate heart problems.",
+                    normalRange: "0 = Normal, 1 = ST-T wave abnormality, 2 = Left ventricular hypertrophy",
+                    importance: "ECG abnormalities can indicate underlying heart conditions."
+                },
+                thalach: {
+                    title: "Maximum Heart Rate Achieved",
+                    description: "The highest heart rate reached during exercise testing.",
+                    details: "Maximum heart rate typically decreases with age. Formula: 220 - age. Low values may indicate reduced cardiovascular fitness.",
+                    normalRange: "Typically 60-85% of (220 - age) during exercise",
+                    importance: "Lower maximum heart rate may indicate reduced heart function or fitness."
+                },
+                exang: {
+                    title: "Exercise Induced Angina",
+                    description: "Whether the patient experiences chest pain during exercise.",
+                    details: "Angina during exercise suggests reduced blood flow to the heart muscle, often due to coronary artery disease.",
+                    normalRange: "0 = No, 1 = Yes",
+                    importance: "Exercise-induced angina is a key symptom of coronary artery disease."
+                },
+                oldpeak: {
+                    title: "ST Depression",
+                    description: "ST segment depression measured during exercise ECG test.",
+                    details: "ST depression indicates reduced blood flow to the heart muscle. Values >2 mm are significant and may indicate ischemia.",
+                    normalRange: "Normal: 0-1 mm, Significant: >2 mm",
+                    importance: "ST depression is a strong indicator of coronary artery disease."
+                },
+                slope: {
+                    title: "Slope of Peak Exercise ST Segment",
+                    description: "The slope of the ST segment during peak exercise.",
+                    details: "This measures how the ECG changes during exercise. Downsloping is more concerning than upsloping.",
+                    normalRange: "0 = Upsloping, 1 = Flat, 2 = Downsloping",
+                    importance: "Downsloping ST segments are associated with higher risk of heart disease."
+                },
+                ca: {
+                    title: "Number of Major Vessels",
+                    description: "Number of major blood vessels colored by fluoroscopy (0-3).",
+                    details: "This indicates how many major coronary arteries show narrowing or blockage. More blocked vessels indicate more severe disease.",
+                    normalRange: "0-3 vessels (0 = no blockage, 3 = all major vessels affected)",
+                    importance: "More blocked vessels indicate more severe coronary artery disease."
+                },
+                thal: {
+                    title: "Thalassemia",
+                    description: "Thalassemia type or blood flow defect.",
+                    details: "This indicates blood flow defects. Normal (3) is best, while fixed (6) or reversible (7) defects suggest heart problems.",
+                    normalRange: "3 = Normal, 6 = Fixed defect, 7 = Reversible defect",
+                    importance: "Blood flow defects indicate reduced oxygen delivery to heart muscle."
+                }
+            },
+            diabetes: {
+                Pregnancies: {
+                    title: "Number of Pregnancies",
+                    description: "Total number of times the patient has been pregnant.",
+                    details: "Multiple pregnancies, especially with gestational diabetes, can increase the risk of developing Type 2 diabetes later in life.",
+                    normalRange: "0-20 (varies by individual)",
+                    importance: "Pregnancy history, especially gestational diabetes, is a risk factor for Type 2 diabetes."
+                },
+                Glucose: {
+                    title: "Plasma Glucose Concentration",
+                    description: "Blood glucose level measured after fasting, in mg/dl.",
+                    details: "Glucose is the body's main source of energy. High levels indicate diabetes or pre-diabetes. Normal fasting glucose is 70-100 mg/dl.",
+                    normalRange: "Normal: 70-100 mg/dl, Pre-diabetes: 100-125, Diabetes: ≥126",
+                    importance: "Elevated glucose is the primary indicator of diabetes."
+                },
+                BloodPressure: {
+                    title: "Diastolic Blood Pressure",
+                    description: "Blood pressure measurement in mm Hg (diastolic - the lower number).",
+                    details: "High blood pressure often accompanies diabetes. Normal diastolic pressure is below 80 mm Hg.",
+                    normalRange: "Normal: <80 mm Hg, Elevated: 80-89, High: ≥90",
+                    importance: "Diabetes and high blood pressure often occur together and increase cardiovascular risk."
+                },
+                SkinThickness: {
+                    title: "Triceps Skin Fold Thickness",
+                    description: "Measurement of skin fold thickness in millimeters, typically measured at the triceps.",
+                    details: "This measures body fat percentage. Higher values indicate more body fat, which is a risk factor for diabetes.",
+                    normalRange: "Varies by age and sex (typically 10-30 mm for adults)",
+                    importance: "Higher body fat increases insulin resistance and diabetes risk."
+                },
+                Insulin: {
+                    title: "2-Hour Serum Insulin",
+                    description: "Insulin level in the blood measured 2 hours after glucose load, in mu U/ml.",
+                    details: "Insulin helps cells absorb glucose. High levels may indicate insulin resistance, a precursor to Type 2 diabetes.",
+                    normalRange: "Normal: 2-25 mu U/ml (varies by lab)",
+                    importance: "High insulin levels suggest insulin resistance, a key factor in Type 2 diabetes."
+                },
+                BMI: {
+                    title: "Body Mass Index",
+                    description: "A measure of body fat based on height and weight.",
+                    details: "BMI = weight (kg) / height (m)². Higher BMI increases diabetes risk. Normal is 18.5-24.9.",
+                    normalRange: "Underweight: <18.5, Normal: 18.5-24.9, Overweight: 25-29.9, Obese: ≥30",
+                    importance: "Higher BMI is strongly associated with increased diabetes risk."
+                },
+                DiabetesPedigreeFunction: {
+                    title: "Diabetes Pedigree Function",
+                    description: "A function that scores the likelihood of diabetes based on family history.",
+                    details: "This calculates genetic predisposition to diabetes based on family members' ages and diabetes status. Higher values indicate stronger family history.",
+                    normalRange: "0.0-2.5 (higher = stronger family history)",
+                    importance: "Family history is a significant risk factor for Type 2 diabetes."
+                },
+                Age: {
+                    title: "Age",
+                    description: "The patient's age in years.",
+                    details: "Risk of Type 2 diabetes increases with age, especially after 45. However, it can occur at any age.",
+                    normalRange: "N/A - Age is a continuous variable",
+                    importance: "Age is a major risk factor, with risk increasing significantly after age 45."
+                }
+            }
+        };
+
+        // Function to show field information
+        function showFieldInfo(type, fieldName) {
+            const info = fieldInfo[type][fieldName];
+            if (!info) return;
+
+            const modal = document.getElementById('infoModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+
+            modalTitle.textContent = info.title;
+            modalBody.innerHTML = `
+                <p><strong>Description:</strong> ${info.description}</p>
+                <p><strong>Details:</strong> ${info.details}</p>
+                <p><strong>Normal Range:</strong> ${info.normalRange}</p>
+                <p><strong>Why It Matters:</strong> ${info.importance}</p>
+            `;
+
+            modal.style.display = 'block';
+        }
+
+        // Function to close modal
+        function closeModal() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('infoModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+        function switchTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tab + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Function to generate heart disease health suggestions
+        function getHeartSuggestions(data, prediction, probability) {
+            const suggestions = [];
+            const age = parseFloat(data.age);
+            const trestbps = parseFloat(data.trestbps);
+            const chol = parseFloat(data.chol);
+            const thalach = parseFloat(data.thalach);
+            const oldpeak = parseFloat(data.oldpeak);
+            const fbs = parseFloat(data.fbs);
+
+            if (prediction === 1) {
+                suggestions.push("⚠️ <strong>Immediate Action Required:</strong> Consult a cardiologist as soon as possible for comprehensive evaluation and treatment plan.");
+                suggestions.push("📋 <strong>Regular Monitoring:</strong> Schedule regular check-ups to monitor your heart health and track any changes.");
+                
+                if (trestbps > 140) {
+                    suggestions.push("🩺 <strong>Blood Pressure:</strong> Your blood pressure is elevated. Consider lifestyle changes and medication if prescribed by your doctor.");
+                }
+                if (chol > 200) {
+                    suggestions.push("💊 <strong>Cholesterol Management:</strong> High cholesterol detected. Focus on a low-fat diet, reduce saturated fats, and consider statin therapy if recommended.");
+                }
+                if (thalach < 120) {
+                    suggestions.push("🏃 <strong>Exercise Capacity:</strong> Low maximum heart rate may indicate reduced cardiovascular fitness. Start with light exercise under medical supervision.");
+                }
+                if (oldpeak > 2) {
+                    suggestions.push("📊 <strong>ECG Changes:</strong> Significant ST depression detected. This requires immediate medical attention and monitoring.");
+                }
+                if (fbs === 1) {
+                    suggestions.push("🍬 <strong>Blood Sugar:</strong> Elevated fasting blood sugar detected. Monitor glucose levels and follow a diabetic-friendly diet.");
+                }
+                
+                suggestions.push("🥗 <strong>Diet:</strong> Adopt a heart-healthy diet rich in fruits, vegetables, whole grains, and lean proteins. Limit sodium, processed foods, and trans fats.");
+                suggestions.push("🚭 <strong>Lifestyle:</strong> Quit smoking if applicable, limit alcohol consumption, and manage stress through meditation or relaxation techniques.");
+                suggestions.push("💊 <strong>Medication:</strong> Follow your doctor's prescribed medications strictly, including blood thinners, beta-blockers, or ACE inhibitors if recommended.");
+            } else {
+                suggestions.push("✅ <strong>Maintain Current Lifestyle:</strong> Continue your healthy habits to prevent future heart issues.");
+                
+                if (age > 50) {
+                    suggestions.push("👴 <strong>Age Factor:</strong> As you age, increase frequency of cardiovascular check-ups (at least annually).");
+                }
+                if (trestbps > 120 && trestbps <= 140) {
+                    suggestions.push("📈 <strong>Blood Pressure:</strong> Your blood pressure is in the pre-hypertensive range. Monitor it regularly and maintain a low-sodium diet.");
+                }
+                if (chol > 180 && chol <= 200) {
+                    suggestions.push("🥑 <strong>Cholesterol:</strong> Keep cholesterol in check by eating healthy fats (avocado, nuts) and avoiding trans fats.");
+                }
+                
+                suggestions.push("🏃 <strong>Regular Exercise:</strong> Aim for at least 150 minutes of moderate-intensity exercise per week (brisk walking, cycling, swimming).");
+                suggestions.push("🥗 <strong>Balanced Diet:</strong> Continue eating a Mediterranean-style diet with plenty of vegetables, fruits, and omega-3 rich foods.");
+                suggestions.push("😴 <strong>Sleep:</strong> Ensure 7-9 hours of quality sleep per night to support heart health.");
+                suggestions.push("🧘 <strong>Stress Management:</strong> Practice stress-reduction techniques like yoga, meditation, or deep breathing exercises.");
+                suggestions.push("📊 <strong>Regular Check-ups:</strong> Schedule annual cardiovascular screenings to monitor your heart health proactively.");
+            }
+
+            return suggestions;
+        }
+
+        // Function to generate diabetes health suggestions
+        function getDiabetesSuggestions(data, prediction, probability) {
+            const suggestions = [];
+            const glucose = parseFloat(data.Glucose);
+            const bmi = parseFloat(data.BMI);
+            const bloodPressure = parseFloat(data.BloodPressure);
+            const age = parseFloat(data.Age);
+            const pregnancies = parseFloat(data.Pregnancies);
+
+            if (prediction === 1) {
+                suggestions.push("⚠️ <strong>Immediate Action Required:</strong> Consult an endocrinologist or primary care physician for diabetes management and treatment.");
+                suggestions.push("📋 <strong>Regular Monitoring:</strong> Check blood glucose levels regularly (fasting and post-meal) as recommended by your doctor.");
+                
+                if (glucose > 200) {
+                    suggestions.push("🍬 <strong>Blood Sugar Control:</strong> Your glucose levels are very high. Follow a strict diabetic diet and take prescribed medications.");
+                } else if (glucose > 140) {
+                    suggestions.push("📊 <strong>Glucose Management:</strong> Monitor blood sugar levels closely and maintain a consistent meal schedule.");
+                }
+                
+                if (bmi > 30) {
+                    suggestions.push("⚖️ <strong>Weight Management:</strong> Significant weight loss (5-10% of body weight) can improve insulin sensitivity. Work with a dietitian.");
+                } else if (bmi > 25) {
+                    suggestions.push("🏋️ <strong>Weight Control:</strong> Aim to lose weight gradually through diet and exercise to improve diabetes control.");
+                }
+                
+                if (bloodPressure > 140) {
+                    suggestions.push("🩺 <strong>Blood Pressure:</strong> High blood pressure often accompanies diabetes. Monitor and manage both conditions together.");
+                }
+                
+                suggestions.push("🍽️ <strong>Diet:</strong> Follow a diabetic meal plan: limit carbohydrates, choose complex carbs, include lean proteins, and plenty of non-starchy vegetables.");
+                suggestions.push("🚫 <strong>Avoid:</strong> Limit sugary drinks, processed foods, white bread, and high-glycemic index foods.");
+                suggestions.push("💊 <strong>Medication:</strong> Take prescribed diabetes medications (metformin, insulin, etc.) exactly as directed by your healthcare provider.");
+                suggestions.push("🏃 <strong>Exercise:</strong> Engage in regular physical activity (30 minutes daily) to help control blood sugar and improve insulin sensitivity.");
+                suggestions.push("👣 <strong>Foot Care:</strong> Check your feet daily for cuts, blisters, or sores. Diabetes can affect circulation and nerve function.");
+            } else {
+                suggestions.push("✅ <strong>Maintain Healthy Habits:</strong> Continue your current lifestyle to prevent diabetes development.");
+                
+                if (glucose > 100 && glucose <= 125) {
+                    suggestions.push("⚠️ <strong>Pre-diabetes Alert:</strong> Your glucose levels are in the pre-diabetic range. Take preventive measures now.");
+                }
+                
+                if (bmi > 25) {
+                    suggestions.push("⚖️ <strong>Weight Management:</strong> Maintain a healthy weight through balanced diet and regular exercise to reduce diabetes risk.");
+                }
+                
+                if (bloodPressure > 120) {
+                    suggestions.push("🩺 <strong>Blood Pressure:</strong> Keep blood pressure in normal range through diet, exercise, and stress management.");
+                }
+                
+                if (pregnancies > 0) {
+                    suggestions.push("🤰 <strong>Gestational Diabetes History:</strong> If you had gestational diabetes, you're at higher risk. Monitor glucose levels regularly.");
+                }
+                
+                suggestions.push("🍎 <strong>Balanced Diet:</strong> Eat a variety of whole foods, limit processed foods and added sugars, and maintain portion control.");
+                suggestions.push("🏃 <strong>Regular Exercise:</strong> Aim for at least 150 minutes of moderate exercise per week to improve insulin sensitivity.");
+                suggestions.push("💧 <strong>Stay Hydrated:</strong> Drink plenty of water and limit sugary beverages.");
+                suggestions.push("😴 <strong>Quality Sleep:</strong> Get 7-9 hours of sleep per night. Poor sleep can affect blood sugar regulation.");
+                suggestions.push("📊 <strong>Regular Screening:</strong> Get annual blood glucose tests, especially if you have risk factors or are over 45.");
+            }
+
+            return suggestions;
+        }
+
+        // Heart Disease Form Handler
+        document.getElementById('heart-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            // Show loading
+            document.getElementById('heart-loading').style.display = 'block';
+            document.getElementById('heart-result').style.display = 'none';
+            
+            try {
+                const response = await fetch('/predict/heart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                // Hide loading
+                document.getElementById('heart-loading').style.display = 'none';
+                
+                // Show result
+                const resultDiv = document.getElementById('heart-result');
+                resultDiv.style.display = 'block';
+                
+                const suggestions = getHeartSuggestions(data, result.prediction, result.probability);
+                const suggestionsHTML = suggestions.map(s => `<li>${s}</li>`).join('');
+                
+                if (result.prediction === 1) {
+                    resultDiv.className = 'result danger';
+                    resultDiv.innerHTML = `
+                        <h3>⚠️ Heart Disease Detected</h3>
+                        <p><strong>Prediction:</strong> ${result.message}</p>
+                        <p><strong>Probability:</strong> ${(result.probability * 100).toFixed(2)}%</p>
+                        <div class="probability-bar">
+                            <div class="probability-fill" style="width: ${result.probability * 100}%">
+                                ${(result.probability * 100).toFixed(1)}%
+                            </div>
+                        </div>
+                        <p style="margin-top: 15px;"><em>Please consult with a healthcare professional for proper diagnosis and treatment.</em></p>
+                        <div class="suggestions danger">
+                            <h4>💊 Health Recommendations</h4>
+                            <ul>${suggestionsHTML}</ul>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h3>✅ No Heart Disease Detected</h3>
+                        <p><strong>Prediction:</strong> ${result.message}</p>
+                        <p><strong>Probability:</strong> ${((1 - result.probability) * 100).toFixed(2)}%</p>
+                        <div class="probability-bar">
+                            <div class="probability-fill" style="width: ${(1 - result.probability) * 100}%">
+                                ${((1 - result.probability) * 100).toFixed(1)}%
+                            </div>
+                        </div>
+                        <p style="margin-top: 15px;"><em>Continue maintaining a healthy lifestyle!</em></p>
+                        <div class="suggestions success">
+                            <h4>💡 Preventive Health Tips</h4>
+                            <ul>${suggestionsHTML}</ul>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('heart-loading').style.display = 'none';
+                const resultDiv = document.getElementById('heart-result');
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result danger';
+                resultDiv.innerHTML = `<h3>Error</h3><p>${error.message}</p>`;
+            }
+        });
+
+        // Diabetes Form Handler
+        document.getElementById('diabetes-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            // Show loading
+            document.getElementById('diabetes-loading').style.display = 'block';
+            document.getElementById('diabetes-result').style.display = 'none';
+            
+            try {
+                const response = await fetch('/predict/diabetes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                // Hide loading
+                document.getElementById('diabetes-loading').style.display = 'none';
+                
+                // Show result
+                const resultDiv = document.getElementById('diabetes-result');
+                resultDiv.style.display = 'block';
+                
+                const suggestions = getDiabetesSuggestions(data, result.prediction, result.probability);
+                const suggestionsHTML = suggestions.map(s => `<li>${s}</li>`).join('');
+                
+                if (result.prediction === 1) {
+                    resultDiv.className = 'result danger';
+                    resultDiv.innerHTML = `
+                        <h3>⚠️ Diabetes Detected</h3>
+                        <p><strong>Prediction:</strong> ${result.message}</p>
+                        <p><strong>Probability:</strong> ${(result.probability * 100).toFixed(2)}%</p>
+                        <div class="probability-bar">
+                            <div class="probability-fill" style="width: ${result.probability * 100}%">
+                                ${(result.probability * 100).toFixed(1)}%
+                            </div>
+                        </div>
+                        <p style="margin-top: 15px;"><em>Please consult with a healthcare professional for proper diagnosis and treatment.</em></p>
+                        <div class="suggestions danger">
+                            <h4>💊 Health Recommendations</h4>
+                            <ul>${suggestionsHTML}</ul>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h3>✅ No Diabetes Detected</h3>
+                        <p><strong>Prediction:</strong> ${result.message}</p>
+                        <p><strong>Probability:</strong> ${((1 - result.probability) * 100).toFixed(2)}%</p>
+                        <div class="probability-bar">
+                            <div class="probability-fill" style="width: ${(1 - result.probability) * 100}%">
+                                ${((1 - result.probability) * 100).toFixed(1)}%
+                            </div>
+                        </div>
+                        <p style="margin-top: 15px;"><em>Continue maintaining a healthy lifestyle!</em></p>
+                        <div class="suggestions success">
+                            <h4>💡 Preventive Health Tips</h4>
+                            <ul>${suggestionsHTML}</ul>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('diabetes-loading').style.display = 'none';
+                const resultDiv = document.getElementById('diabetes-result');
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result danger';
+                resultDiv.innerHTML = `<h3>Error</h3><p>${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
+
